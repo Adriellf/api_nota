@@ -1,0 +1,60 @@
+# Binários gerados por compiladores do Delphi (seguros para excluir)
+*.res
+*.tlb
+
+*.exe 
+*.obj
+*.dll
+*.bpl
+*.bpi
+*.dcp
+*.dof
+*.dproj.2007
+*.mes
+*.so
+*.apk
+*.drc
+*.map
+*.dres
+*.rsm
+*.tds
+*.dcu
+*.lib
+*.a
+*.o
+*.ocx
+Win32/
+Android/
+bin/
+
+# Arquivo de configuração do Deployment Manager para seu projeto. Adicionado no Delphi XE2.
+# Descomente isto se não for desenvolvimento móvel e você não usar o recurso de depuração remota.
+#*.vlb
+
+# Arquivos de objetos # C ++ produzidos quando a geração de arquivos de saída C / C ++ está configurada. 
+# Descomente isto se você não estiver usando objetos externos (biblioteca zlib por exemplo).
+*.deployproj
+
+# Visual LiveBindings file. Adicionado no Delphi XE2.
+# Descomente isto se você não estiver usando o LiveBindings Designer.
+#*.ddp
+
+# Arquivos autogerados Delphi (informação duplicada)
+*.cfg
+*.hpp
+*Resource.rc
+
+# Arquivos locais do Delphi (informações específicas do usuário)
+*.local
+*.identcache
+*.projdata
+*.tvsconfig
+*.dsk
+
+# Histórico Delphi e backups
+__history/
+__recovery/
+*.~*
+
+# Arquivo de estatísticas da Castalia (desde que o XAL7 Castalia é distribuído com o Delphi)
+*.stat

@@ -9,6 +9,14 @@
     <Transaction>2020/03/11 15:49:56.000.452,C:\Users\Analise05\Documents\Embarcadero\Studio\Projects\Unit9.fmx=C:\Adriel\nota_web\Unit9.fmx</Transaction>
     <Transaction>2020/03/11 15:49:56.000.452,C:\Users\Analise05\Documents\Embarcadero\Studio\Projects\Unit9.pas=C:\Adriel\nota_web\Unit9.pas</Transaction>
     <Transaction>2020/03/11 15:49:57.000.190,C:\Users\Analise05\Documents\Embarcadero\Studio\Projects\Project6.dproj=C:\Adriel\nota_web\Project6.dproj</Transaction>
+    <Transaction>2020/03/19 14:44:43.137,=C:\Adriel\nota_web\Unit1.pas</Transaction>
+    <Transaction>2020/03/19 14:45:04.266,C:\Adriel\nota_web\uLogin.pas=C:\Adriel\nota_web\Unit1.pas</Transaction>
+    <Transaction>2020/03/19 14:48:39.894,C:\Adriel\nota_web\uUsuario.pas=C:\Adriel\nota_web\uLogin.pas</Transaction>
+    <Transaction>2020/03/19 14:52:17.389,=C:\Adriel\nota_web\Unit1.pas</Transaction>
+    <Transaction>2020/03/19 14:52:26.368,C:\Adriel\nota_web\uDestinatario.pas=C:\Adriel\nota_web\Unit1.pas</Transaction>
+    <Transaction>2020/03/19 14:53:15.931,C:\Adriel\nota_web\uIde.pas=C:\Adriel\nota_web\uDestinatario.pas</Transaction>
+    <Transaction>2020/03/19 15:09:36.622,=C:\Adriel\nota_web\Unit1.pas</Transaction>
+    <Transaction>2020/03/19 15:10:14.856,C:\Adriel\nota_web\uDestinatario.pas=C:\Adriel\nota_web\Unit1.pas</Transaction>
   </Transactions>
 	<ActiveMobileDevice>
 		<PiPhone iOSSimulator="iPhone5"/>

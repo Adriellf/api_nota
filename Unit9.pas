@@ -10,68 +10,7 @@ uses
   System.Net.HttpClient, System.Net.HttpClientComponent, IdBaseComponent,
   IdComponent, IdTCPConnection, IdTCPClient, IdHTTP, REST.Json,
   REST.Response.Adapter,
-  FMX.ScrollBox, FMX.Memo, uLkJSON;
-
-type
-  Tusuario = Class
-  private
-    Femail: string;
-    Fpassword: string;
-    Fusername: string;
-    procedure Setemail(const Value: string);
-    procedure Setpassword(const Value: string);
-    procedure Setusername(const Value: string);
-
-  public
-    property username: string read Fusername write Setusername;
-    property email: string read Femail write Setemail;
-    property password: string read Fpassword write Setpassword;
-  End;
-
-type
-  Tide = class
-  private
-    Fdhsaient: String;
-    Findpres: integer;
-    Ftpamb: integer;
-    Ftpemis: integer;
-    Ftpimp: integer;
-    procedure Setdhsaient(const Value: String);
-    procedure Setindpres(const Value: integer);
-    procedure Settpamb(const Value: integer);
-    procedure Settpimp(const Value: integer);
-    procedure Settpemis(const Value: integer);
-
-  public
-    property tpimp: integer read Ftpimp write Settpimp;
-    property ttpemis: integer read Ftpemis write Settpemis;
-    property dhsaient: String read Fdhsaient write Setdhsaient;
-    property tpamb: integer read Ftpamb write Settpamb;
-    property indpres: integer read Findpres write Setindpres;
-
-  end;
-
-type
- Tdestinatario = class
-   private
-    Femail: string;
-    Fcpf: string;
-    procedure Setcpf(const Value: string);
-    procedure Setemail(const Value: string);
-   public
-    property email : string read Femail write Setemail;
-    property cpf : string read Fcpf write Setcpf;
- end;
-
-  TArrayide = array of Tide;
-
-  TRespide = class
-  private
-    Frespide: TArrayide;
-    procedure Setrespide(const Value: TArrayide);
-  published
-    property respide: TArrayide read Frespide write Setrespide;
-  end;
+  FMX.ScrollBox, FMX.Memo, uLkJSON, uUsuario, uIde, uDestinatario;
 
 type
   TForm9 = class(TForm)
@@ -103,6 +42,9 @@ type
 var
   Form9: TForm9;
   Url: string;
+  Usuario: Tusuario;
+  Ide : Tide;
+  Destinatario : Tdestinatario;
 
 implementation
 
@@ -129,23 +71,22 @@ var
   Jsonteste: TStringStream;
   js: TJSONObject;
   jslkJSON: TlkJSONobject;
-  dados: Tusuario;
   Retorno, Json: string;
+  retornoBoolean:boolean;
 begin
   JsonStreamRetorno := TStringStream.Create('');
   // JsonStreamEnvio   :=   TStringList.Create();
   Jsonteste := TStringStream.Create('');
-  dados := Tusuario.Create;
 
   FIdHTTPConexao.Request.ContentType := '';
   FIdHTTPConexao.Response.Clear;
   FIdHTTPConexao.Request.CustomHeaders.Clear;
 
-  dados.email := 'homologa@geniusnt.com';
-  dados.username := 'homologa';
-  dados.password := '1';
+  Usuario.email := 'homologa@geniusnt.com';
+  Usuario.username := 'homologa';
+  Usuario.password := '1';
 
-  js := Tjson.objectToJsonObject(dados);
+  js := Tjson.objectToJsonObject(Usuario);
 
   Memo1.Lines.Add(js.ToString);
   Jsonteste.WriteString(js.ToString);
@@ -156,16 +97,28 @@ begin
   try // geniusnuvens.com.br
     FIdHTTPConexao.Post(Url + '/auth/token', Jsonteste, JsonStreamRetorno);
 
-    Retorno := JsonStreamRetorno.DataString;
   finally
-    Memo1.Lines.Add('=====================================');
-    Memo1.Lines.Add(Retorno);
-    jslkJSON := TlkJSON.ParseText(JsonStreamRetorno.DataString)
-      as TlkJSONobject;
-    FToken := jslkJSON.getstring('access_token');
 
-    // <-Guada esse token para as demais requisições
+    jslkJSON := TlkJSON.ParseText(JsonStreamRetorno.DataString) as TlkJSONobject;
+    retornoBoolean := jslkJSON.getBoolean('error');
+
+    //usando para teste
+    Retorno := JsonStreamRetorno.DataString;//ShowMessage(retorno);
+    Memo1.Lines.Add(Retorno);
+    //usando para teste
+    if retornoboolean then
+    begin
+      Memo1.Lines.Add('=====================================');
+      retorno := jslkJSON.getstring('message');
+      Memo1.Lines.Add('Mensagem : '+ retorno);
+    end else
+    begin
+      Memo1.Lines.Add('=====================================');
+      Memo1.Lines.Add(Retorno);
     // ShowMessage(FToken );
+      FToken := jslkJSON.getstring('access_token');   // <-Guarda esse token para as demais requisições
+    end;
+
   end;
 
 end;
@@ -186,20 +139,6 @@ end;
 
 { Tusuario }
 
-procedure Tusuario.Setemail(const Value: string);
-begin
-  Femail := Value;
-end;
-
-procedure Tusuario.Setpassword(const Value: string);
-begin
-  Fpassword := Value;
-end;
-
-procedure Tusuario.Setusername(const Value: string);
-begin
-  Fusername := Value;
-end;
 
 procedure TForm9.GerarHeader(aIdHTTPConexao: TIdHTTP);
 var
@@ -275,30 +214,27 @@ end;
 
 procedure TForm9.emitirNota;
 var
-  dados: Tide;
-  destinatario : Tdestinatario;
-  arrayjson: TRespide;
   JsonStreamRetorno: TStringStream;
   Jsonteste: TStringStream;
   Retorno, Ajson, xmlNota: string;
   js,jsdest: TJSONObject;
   jslkJSON: TlkJSONobject;
+  retornoBoolean :boolean;
 begin
-  dados := Tide.Create;
-  dados.Findpres := 1;
-  dados.Ftpamb := 2;
-  dados.Ftpemis := 1;
-  dados.tpimp := 4;
 
-  destinatario := Tdestinatario.Create;
-  destinatario.Femail:='analise@geniusnt.com';
-  destinatario.Fcpf:='85931956522';
+  Ide.indpres := 1;
+  Ide.tpamb := 2;
+  Ide.tpemis := 9; //1 teste
+  Ide.tpimp := 4;
 
+  Destinatario.email:='adriellf@live.com';
+  Destinatario.cpf:='02912738580';//cpf aleatorio
 
 
-  js := Tjson.objectToJsonObject(dados);
-  jsdest:= Tjson.objectToJsonObject(destinatario);
+  js := Tjson.objectToJsonObject(ide);
+  jsdest:= Tjson.objectToJsonObject(Destinatario);
 
+  // tem a forma correta de fazer mas a empresa quer assim para não perder tempo
   Ajson := '{"ide":' + js.ToString +',"dest":'+jsdest.ToJSON+ '}';
 
   JsonStreamRetorno := TStringStream.Create('');
@@ -317,32 +253,44 @@ begin
     'bearer ' + FToken);
 
   try
-    try
-      FIdHTTPConexao.Post(Url + '/api/vendas/779/nfces', Jsonteste,
-        JsonStreamRetorno);
-    except
-      on E: EIdHttpProtocolException do
-      begin
-        if E.ErrorCode = 404 then
-          ShowMessage('Danfe não encontrado!');
-        exit
-      end;
 
-    end;
-
+      FIdHTTPConexao.Post(Url + '/api/vendas/779/nfces', Jsonteste,JsonStreamRetorno);
   finally
-    Retorno := JsonStreamRetorno.DataString;
-    Memo1.Lines.Add('=====================================');
-    Memo1.Lines.Add(FIdHTTPConexao.ResponseCode.ToString);
-    Memo1.Lines.Add(Retorno);
 
-    jslkJSON := TlkJSON.ParseText(JsonStreamRetorno.DataString)
-      as TlkJSONobject;
+      jslkJSON := TlkJSON.ParseText(JsonStreamRetorno.DataString) as TlkJSONobject;
+      retornoBoolean := jslkJSON.getBoolean('error');
 
-    xmlNota := jslkJSON.getstring('xml_url');
-    Memo1.Lines.Add('xmlNota: '+xmlNota);
-    Memo1.Lines.Add('=====================================');
-    //if xmlNota <> '' then   donwloadNota(xmlNota);
+      if retornoboolean then
+      begin
+        Memo1.Lines.Add('=====================================');
+        retorno := jslkJSON.getstring('message');
+        Memo1.Lines.Add('Mensagem : '+ retorno);
+      end else
+      begin
+        xmlNota := jslkJSON.getstring('xml_url');
+        Memo1.Lines.Add('xmlNota : '+xmlNota);
+      end;
+     { if retorno = 'true' then
+      begin
+        Memo1.Lines.Add('=====================================');
+        Memo1.Lines.Add('entrou: '+ retorno);
+      end else
+      begin
+        jslkJSON := TlkJSON.ParseText(JsonStreamRetorno.DataString) as TlkJSONobject;
+        Retorno := JsonStreamRetorno.DataString;
+        Memo1.Lines.Add('=====================================');
+        Memo1.Lines.Add(FIdHTTPConexao.ResponseCode.ToString);
+        Memo1.Lines.Add(Retorno);
+      end;  }
+
+  {  if false then
+    begin
+      jslkJSON := TlkJSON.ParseText(JsonStreamRetorno.DataString) as TlkJSONobject;
+      xmlNota := jslkJSON.getstring('xml_url');
+      Memo1.Lines.Add('xmlNota: '+xmlNota);
+      Memo1.Lines.Add('=====================================');
+      //if xmlNota <> '' then   donwloadNota(xmlNota);
+    end; }
   end;
 
 end;
@@ -350,6 +298,9 @@ end;
 procedure TForm9.FormCreate(Sender: TObject);
 begin
   Url := 'http://192.168.0.34:8000';
+  Usuario:= Tusuario.Create;
+  Ide := Tide.Create;
+  Destinatario := Tdestinatario.Create;
 end;
 
 procedure TForm9.Clear(aIdHTTPConexao: TIdHTTP);
@@ -365,51 +316,6 @@ begin
     lIdHTTPConexao := aIdHTTPConexao;
   end;
   FIdHTTPConexao.Request.Clear;
-end;
-{ Tide }
-
-procedure Tide.Setdhsaient(const Value: String);
-begin
-  Fdhsaient := Value;
-end;
-
-procedure Tide.Setindpres(const Value: integer);
-begin
-  Findpres := Value;
-end;
-
-procedure Tide.Settpamb(const Value: integer);
-begin
-  Ftpamb := Value;
-end;
-
-procedure Tide.Settpimp(const Value: integer);
-begin
-  Ftpimp := Value;
-end;
-
-procedure Tide.Settpemis(const Value: integer);
-begin
-  Ftpemis := Value;
-end;
-
-{ TRespide }
-
-procedure TRespide.Setrespide(const Value: TArrayide);
-begin
-  Frespide := Value;
-end;
-
-{ Tdestinatario }
-
-procedure Tdestinatario.Setcpf(const Value: string);
-begin
-  Fcpf := Value;
-end;
-
-procedure Tdestinatario.Setemail(const Value: string);
-begin
-  Femail := Value;
 end;
 
 end.
