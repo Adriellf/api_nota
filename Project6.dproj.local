@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2019/10/03 13:00:59.000.240,=C:\Users\Analise05\Documents\Embarcadero\Studio\Projects\Unit9.pas</Transaction>
+    <Transaction>2020/01/03 10:16:46.000.958,=C:\Users\Analise05\Documents\Embarcadero\Studio\Projects\Unit9.pas</Transaction>
+    <Transaction>2020/01/03 11:20:51.000.345,=C:\Users\Analise05\Documents\Embarcadero\Studio\Projects\Unit9.pas</Transaction>
+    <Transaction>2020/02/19 12:31:09.000.773,=C:\Users\Analise05\Documents\Embarcadero\Studio\Projects\Unit9.pas</Transaction>
+    <Transaction>2020/03/11 15:47:59.000.543,=C:\Users\Analise05\Documents\Embarcadero\Studio\Projects\Unit9.pas</Transaction>
+    <Transaction>2020/03/11 15:49:56.000.452,C:\Users\Analise05\Documents\Embarcadero\Studio\Projects\Unit9.fmx=C:\Adriel\nota_web\Unit9.fmx</Transaction>
+    <Transaction>2020/03/11 15:49:56.000.452,C:\Users\Analise05\Documents\Embarcadero\Studio\Projects\Unit9.pas=C:\Adriel\nota_web\Unit9.pas</Transaction>
+    <Transaction>2020/03/11 15:49:57.000.190,C:\Users\Analise05\Documents\Embarcadero\Studio\Projects\Project6.dproj=C:\Adriel\nota_web\Project6.dproj</Transaction>
+  </Transactions>
+	<ActiveMobileDevice>
+		<PiPhone iOSSimulator="iPhone5"/>
+		<NoProfile Android="4e2bd8b2"/>
+	</ActiveMobileDevice>
+</BorlandProject>
