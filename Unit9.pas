@@ -21,9 +21,11 @@ type
     BtDownload: TButton;
     IdHTTP: TIdHTTP;
     OpenDialog1: TOpenDialog;
+    btRefreshToken: TButton;
     procedure btTOKENClick(Sender: TObject);
     procedure btEmitirnotaClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure btRefreshTokenClick(Sender: TObject);
   private
     function Aspa(TextoX: String): String;
     procedure AddHeader(chave, Value: string; aIdHTTPConexao: TIdHTTP);
@@ -35,8 +37,10 @@ type
   public
     { Public declarations }
     FToken: string;
+    FRereshToken: String;
     procedure gettoken;
     procedure emitirNota;
+    procedure RefreshToken;
   end;
 
 var
@@ -61,6 +65,11 @@ end;
 procedure TForm9.btEmitirnotaClick(Sender: TObject);
 begin
   emitirNota;
+end;
+
+procedure TForm9.btRefreshTokenClick(Sender: TObject);
+begin
+  RefreshToken;
 end;
 
 procedure TForm9.gettoken;
@@ -98,30 +107,127 @@ begin
     FIdHTTPConexao.Post(Url + '/auth/token', Jsonteste, JsonStreamRetorno);
 
   finally
+     case FIdHTTPConexao.ResponseCode of
+      401 :
+      begin
+        Memo1.Lines.Add('=====================================');
+        Memo1.Lines.Add('erro 401: '+ JsonStreamRetorno.DataString);
+      end;
 
-    jslkJSON := TlkJSON.ParseText(JsonStreamRetorno.DataString) as TlkJSONobject;
-    retornoBoolean := jslkJSON.getBoolean('error');
+      500:
+      begin
+        Memo1.Lines.Add('=====================================');
+        Memo1.Lines.Add('erro 500: '+ JsonStreamRetorno.DataString);
+      end;
 
-    //usando para teste
-    Retorno := JsonStreamRetorno.DataString;//ShowMessage(retorno);
-    Memo1.Lines.Add(Retorno);
-    //usando para teste
-    if retornoboolean then
-    begin
-      Memo1.Lines.Add('=====================================');
-      retorno := jslkJSON.getstring('message');
-      Memo1.Lines.Add('Mensagem : '+ retorno);
-    end else
-    begin
-      Memo1.Lines.Add('=====================================');
-      Memo1.Lines.Add(Retorno);
-    // ShowMessage(FToken );
-      FToken := jslkJSON.getstring('access_token');   // <-Guarda esse token para as demais requisições
-    end;
+      200:
+      begin
+        jslkJSON := TlkJSON.ParseText(JsonStreamRetorno.DataString) as TlkJSONobject;
+        FToken := jslkJSON.getstring('access_token');   // <-Guarda esse token para as demais requisições
+        FRereshToken:= jslkJSON.getString('refresh_token');// <- Guarda o refresh token para quando expirar o acesso
+        Memo1.Lines.Add('access_token : ' + FToken)
+      end;
+
+     end;
+
+//    retornoBoolean := jslkJSON.getBoolean('error');
+//
+//
+//    //usando para teste
+//    Retorno := JsonStreamRetorno.DataString;//ShowMessage(retorno);
+//    Memo1.Lines.Add(Retorno);
+//
+//    //usando para teste
+//    if retornoboolean then
+//    begin
+//      Memo1.Lines.Add('=====================================');
+//      retorno := jslkJSON.getstring('message');
+//      Memo1.Lines.Add('Mensagem : '+ retorno);
+//    end else
+//    begin
+//      Memo1.Lines.Add('=====================================');
+//      Memo1.Lines.Add(Retorno);
+//    // ShowMessage(FToken );
+//
+//    end;
 
   end;
 
 end;
+
+procedure TForm9.RefreshToken;
+var
+ JsonStreamRetorno: TStringStream;
+ JsonStreamEnvio: TStringStream;
+ Retorno, Ajson: string;
+ jslkJSON:TlkJSONobject;
+begin
+ if FRereshToken <> '' then
+ begin
+   JsonStreamRetorno := TStringStream.Create('');
+   JsonStreamEnvio := TStringStream.Create('');
+
+   FIdHTTPConexao.Request.ContentType := '';
+   FIdHTTPConexao.Response.Clear;
+   FIdHTTPConexao.Request.CustomHeaders.Clear;
+   FIdHTTPConexao.Request.CustomHeaders.AddValue('Content-Type',
+    'application/json');
+
+   Ajson := '{"refresh_token":"' + FRereshToken +'"}';
+
+   JsonStreamRetorno := TStringStream.Create('');
+   JsonStreamEnvio := TStringStream.Create('');
+   JsonStreamEnvio.WriteString(Ajson);
+
+  try
+    try
+     FIdHTTPConexao.Post(Url + '/auth/refresh_token', JsonStreamEnvio,JsonStreamRetorno);
+    except
+
+    end;
+  finally
+
+    case FIdHTTPConexao.ResponseCode of
+      401 :
+      begin
+        Memo1.Lines.Add('=====================================');
+        Memo1.Lines.Add('erro 401: '+ JsonStreamRetorno.DataString);
+      end;
+
+      500:
+      begin
+        Memo1.Lines.Add('=====================================');
+        Memo1.Lines.Add('erro 500: '+ JsonStreamRetorno.DataString);
+      end;
+
+      200:
+      begin
+        jslkJSON := TlkJSON.ParseText(JsonStreamRetorno.DataString) as TlkJSONobject;
+        FToken := jslkJSON.getstring('access_token');
+        Memo1.Lines.Add('deu bom  : '+ FToken);
+        Memo1.Lines.Add('Json Completo : '+ JsonStreamRetorno.DataString);
+      end;
+
+    end;
+
+
+//    retornoBoolean := jslkJSON.getBoolean('error');
+//
+//    if (FIdHTTPConexao.ResponseCode <> 401) and (FIdHTTPConexao.ResponseCode <> 500) then
+//    begin
+//      Memo1.Lines.Add('=====================================');
+//
+//    end else
+//    begin
+//
+//      Memo1.Lines.Add('deu merda : '+FIdHTTPConexao.ResponseCode.ToString);
+//    end;
+  end;
+  end else
+ begin
+   gettoken;
+ end;
+ end;
 
 function TForm9.Aspa(TextoX: String): String;
 begin
@@ -234,7 +340,7 @@ begin
   js := Tjson.objectToJsonObject(ide);
   jsdest:= Tjson.objectToJsonObject(Destinatario);
 
-  // tem a forma correta de fazer mas a empresa quer assim para não perder tempo
+  //tem a forma correta de fazer mas a empresa quer assim para não perder tempo
   Ajson := '{"ide":' + js.ToString +',"dest":'+jsdest.ToJSON+ '}';
 
   JsonStreamRetorno := TStringStream.Create('');
@@ -253,24 +359,49 @@ begin
     'bearer ' + FToken);
 
   try
-
+    try
       FIdHTTPConexao.Post(Url + '/api/vendas/779/nfces', Jsonteste,JsonStreamRetorno);
+    except
+
+    end;
   finally
 
-      jslkJSON := TlkJSON.ParseText(JsonStreamRetorno.DataString) as TlkJSONobject;
-      retornoBoolean := jslkJSON.getBoolean('error');
-
-      if retornoboolean then
+    case FIdHTTPConexao.ResponseCode of
+      401 :
       begin
         Memo1.Lines.Add('=====================================');
-        retorno := jslkJSON.getstring('message');
-        Memo1.Lines.Add('Mensagem : '+ retorno);
-      end else
+        Memo1.Lines.Add('erro 401: '+ JsonStreamRetorno.DataString);
+      end;
+
+      500:
       begin
+        Memo1.Lines.Add('=====================================');
+        Memo1.Lines.Add('erro 500: '+ JsonStreamRetorno.DataString);
+      end;
+
+      200:
+      begin
+        jslkJSON := TlkJSON.ParseText(JsonStreamRetorno.DataString) as TlkJSONobject;
         xmlNota := jslkJSON.getstring('xml_url');
         Memo1.Lines.Add('xmlNota : '+xmlNota);
       end;
-     { if retorno = 'true' then
+    end;
+
+//
+//      jslkJSON := TlkJSON.ParseText(JsonStreamRetorno.DataString) as TlkJSONobject;
+//      retornoBoolean := jslkJSON.getBoolean('error');
+//
+//      if retornoboolean then
+//      begin
+//        Memo1.Lines.Add('=====================================');
+//        retorno := jslkJSON.getstring('message');
+//        Memo1.Lines.Add('Mensagem : '+ retorno);
+//      end else
+//      begin
+//        xmlNota := jslkJSON.getstring('xml_url');
+//        Memo1.Lines.Add('xmlNota : '+xmlNota);
+//      end;
+     { if retorno then
       begin
         Memo1.Lines.Add('=====================================');
         Memo1.Lines.Add('entrou: '+ retorno);
@@ -297,7 +428,7 @@ end;
 
 procedure TForm9.FormCreate(Sender: TObject);
 begin
-  Url := 'http://192.168.0.34:8000';
+  Url := 'http://192.168.0.34:8000';  //'http://192.168.0.34:8000';
   Usuario:= Tusuario.Create;
   Ide := Tide.Create;
   Destinatario := Tdestinatario.Create;

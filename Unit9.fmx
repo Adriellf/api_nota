@@ -12,8 +12,11 @@ object Form9: TForm9
   object btTOKEN: TButton
     Position.X = 16.000000000000000000
     Position.Y = 8.000000000000000000
+    Size.Width = 97.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
     TabOrder = 0
-    Text = 'Button'
+    Text = 'btGetToken'
     OnClick = btTOKENClick
   end
   object Memo1: TMemo
@@ -29,21 +32,37 @@ object Form9: TForm9
     Viewport.Height = 237.000000000000000000
   end
   object btEmitirnota: TButton
-    Position.X = 176.000000000000000000
-    Position.Y = 16.000000000000000000
+    Position.X = 16.000000000000000000
+    Position.Y = 56.000000000000000000
+    Size.Width = 97.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
     TabOrder = 4
     Text = 'btEmitirnota'
     OnClick = btEmitirnotaClick
   end
   object BtDownload: TButton
-    Position.X = 352.000000000000000000
-    Position.Y = 40.000000000000000000
+    Position.X = 144.000000000000000000
+    Position.Y = 56.000000000000000000
+    Size.Width = 105.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
     TabOrder = 6
     Text = 'BtDownload'
   end
   object OpenDialog1: TOpenDialog
     Left = 248
     Top = 160
+  end
+  object btRefreshToken: TButton
+    Position.X = 144.000000000000000000
+    Position.Y = 8.000000000000000000
+    Size.Width = 105.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 11
+    Text = 'btRefreshToken'
+    OnClick = btRefreshTokenClick
   end
   object FIdHTTPConexao: TIdHTTP
     AllowCookies = True
