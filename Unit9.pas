@@ -103,9 +103,12 @@ begin
   FIdHTTPConexao.Request.CustomHeaders.AddValue('Content-Type',
     'application/json');
 
-  try // geniusnuvens.com.br
-    FIdHTTPConexao.Post(Url + '/auth/token', Jsonteste, JsonStreamRetorno);
+  try
+    try
+      FIdHTTPConexao.Post(Url + '/auth/token', Jsonteste, JsonStreamRetorno);
+    except
 
+    end;
   finally
      case FIdHTTPConexao.ResponseCode of
       401 :

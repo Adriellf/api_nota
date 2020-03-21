@@ -103,9 +103,12 @@ begin
   FIdHTTPConexao.Request.CustomHeaders.AddValue('Content-Type',
     'application/json');
 
-  try // geniusnuvens.com.br
-    FIdHTTPConexao.Post(Url + '/auth/token', Jsonteste, JsonStreamRetorno);
+  try
+    try
+      FIdHTTPConexao.Post(Url + '/auth/token', Jsonteste, JsonStreamRetorno);
+    except
 
+    end;
   finally
      case FIdHTTPConexao.ResponseCode of
       401 :
@@ -173,16 +176,19 @@ begin
    FIdHTTPConexao.Request.CustomHeaders.AddValue('Content-Type',
     'application/json');
 
-   Ajson := '{"refresh_token":"' +' '   +'"}';
+   Ajson := '{"refresh_token":"' + FRereshToken +'"}';
 
    JsonStreamRetorno := TStringStream.Create('');
    JsonStreamEnvio := TStringStream.Create('');
    JsonStreamEnvio.WriteString(Ajson);
 
   try
+    try
+     FIdHTTPConexao.Post(Url + '/auth/refresh_token', JsonStreamEnvio,JsonStreamRetorno);
+    except
 
-   FIdHTTPConexao.Post(Url + '/auth/refresh_token', JsonStreamEnvio,JsonStreamRetorno);
-  except
+    end;
+  finally
 
     case FIdHTTPConexao.ResponseCode of
       401 :
@@ -194,7 +200,7 @@ begin
       500:
       begin
         Memo1.Lines.Add('=====================================');
-        Memo1.Lines.Add('erro 500: '+ FIdHTTPConexao.ResponseText);//JsonStreamRetorno.DataString);
+        Memo1.Lines.Add('erro 500: '+ JsonStreamRetorno.DataString);
       end;
 
       200:
@@ -337,7 +343,7 @@ begin
   js := Tjson.objectToJsonObject(ide);
   jsdest:= Tjson.objectToJsonObject(Destinatario);
 
-  // tem a forma correta de fazer mas a empresa quer assim para não perder tempo
+  //tem a forma correta de fazer mas a empresa quer assim para não perder tempo
   Ajson := '{"ide":' + js.ToString +',"dest":'+jsdest.ToJSON+ '}';
 
   JsonStreamRetorno := TStringStream.Create('');
@@ -356,23 +362,48 @@ begin
     'bearer ' + FToken);
 
   try
-
+    try
       FIdHTTPConexao.Post(Url + '/api/vendas/779/nfces', Jsonteste,JsonStreamRetorno);
+    except
+
+    end;
   finally
 
-      jslkJSON := TlkJSON.ParseText(JsonStreamRetorno.DataString) as TlkJSONobject;
-      retornoBoolean := jslkJSON.getBoolean('error');
-
-      if retornoboolean then
+    case FIdHTTPConexao.ResponseCode of
+      401 :
       begin
         Memo1.Lines.Add('=====================================');
-        retorno := jslkJSON.getstring('message');
-        Memo1.Lines.Add('Mensagem : '+ retorno);
-      end else
+        Memo1.Lines.Add('erro 401: '+ JsonStreamRetorno.DataString);
+      end;
+
+      500:
       begin
+        Memo1.Lines.Add('=====================================');
+        Memo1.Lines.Add('erro 500: '+ JsonStreamRetorno.DataString);
+      end;
+
+      200:
+      begin
+        jslkJSON := TlkJSON.ParseText(JsonStreamRetorno.DataString) as TlkJSONobject;
         xmlNota := jslkJSON.getstring('xml_url');
         Memo1.Lines.Add('xmlNota : '+xmlNota);
       end;
+    end;
+
+//
+//      jslkJSON := TlkJSON.ParseText(JsonStreamRetorno.DataString) as TlkJSONobject;
+//      retornoBoolean := jslkJSON.getBoolean('error');
+//
+//      if retornoboolean then
+//      begin
+//        Memo1.Lines.Add('=====================================');
+//        retorno := jslkJSON.getstring('message');
+//        Memo1.Lines.Add('Mensagem : '+ retorno);
+//      end else
+//      begin
+//        xmlNota := jslkJSON.getstring('xml_url');
+//        Memo1.Lines.Add('xmlNota : '+xmlNota);
+//      end;
      { if retorno then
       begin
         Memo1.Lines.Add('=====================================');
